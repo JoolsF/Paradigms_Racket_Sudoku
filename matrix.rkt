@@ -43,7 +43,7 @@
 ;; (transform matrix)
 ;; once all sets of numbers are reduced to length 1, flatten each row into original format of Matrix
 
-;(map (lambda (x) (map-matrix replace-empty x)) matrix) ; replaces zeroes with {1-9} this should be replace by (transform matrix)
+(map (lambda (x) (map-matrix replace-empty x)) matrix) ; replaces zeroes with {1-9} this should be replace by (transform matrix)
 
 (define (transform matrix) 
   (append matrix (list 1)))
