@@ -8,6 +8,7 @@
 ; (list-index (curry equal? 2) (car (transform matrix)))
 ;;END OF NOTES TO DELETE
 
+
 (define matrix 
   (list (list 0 2 5 0 0 1 0 0 0)
         (list 1 0 4 2 5 0 0 0 0)
@@ -65,14 +66,16 @@
 ;; (solve matrix)
 ;; (transform matrix)
 
-(find-singleton (car(transform matrix)))
+;(find-singleton (car(transform matrix)))
 
 
+
+;;this needs refactoring, hard to read
 (map (lambda (x)
        (cond
          [(= (length x) 1) x]
          [else (remove* (find-singleton (car(transform matrix))) x)])) 
-     jlist)
+     (car(transform matrix)))
 
 
 
