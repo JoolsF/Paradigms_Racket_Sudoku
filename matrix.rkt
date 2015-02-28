@@ -1,8 +1,8 @@
 #lang racket
 
-
 (require racket/include)
 (include "data.rkt")
+(include "test2.rkt")
 
 
 ;; HELPER FUNCTIONS - To move other module
@@ -19,7 +19,7 @@
 ; TO DO - refactor 
 ;Applies function to innermost lists of a matrix
 (define (deep-map-innermost-list f l)
-  (let deep ((x l))
+  (let deep ((x l)) 
     (cond [(null? x) x]
           [(and (pair? x) (number? (car x)))
            (f x)]
@@ -28,8 +28,7 @@
 
 
 
-
-
+; Helper method to get nth item of list
 (define (get-item number list)                   
       (cond 
         [(null? list) '()]             
@@ -75,23 +74,62 @@
 
 
 
+;;TEST AREA
+
+
+(define (remove-if-non-singleton lst-to-remove lst)
+  (if (> (length lst) 1) 
+      (remove* lst-to-remove lst)
+      lst)) 
+
+
+
+; TO DO - refactor
+(define (find-singleton-column item-no matrix)
+  (find-singleton (map (lambda (x) (get-item 0 x)) matrix)))
+
+
+(define (remove-col-dupe matrix)
+  (deep-map-innermost-list (lambda (x) 
+                             (remove-if-non-singleton (find-singleton-column 0 matrix) x))
+                           matrix))
+                         
+
+ ;;TEST AREA
+
+(define (rebuild jmatrix)
+  (append (map (lambda (x) (rebuild-row x '() 0)) jmatrix) '()))
+  ;(rebuild-row jmatrix '() 0))
+
+
+  
+(define (rebuild-row row acc index)
+  (cond
+  [(empty? row) acc]
+   [(rebuild-row (cdr row) acc (+ index 1)) (append acc row  )]))
+
+
+
+;;for each row, rebuild with  remove-if-non-singleton (find-singleton-column index matrix) row
+
+
+
+(rebuild (solve(transform matrix)))
+
+
+
+;;END OF TEST AREA
+
 ;; PROGRAM EXCECUTION
-;(solve (transform matrix))
+
+;(find-singleton-column 0 (solve(transform matrix)))
 
 
 
-(define (iterate-col matrix)
-  (deep-map-innermost-list (lambda (x) (print x)) 
-                         matrix))
+;(length (solve (transform matrix)))
 
+;(remove-col-dupe (solve(transform matrix)))
 
-;(get-item 1 (car(transform matrix)))
-
-
-;(map (lambda (x) (get-item 1 x)) (transform matrix))
-
-
-(find-singleton (get-item 0 (transform matrix)))
 
 ;;;NOTES TO DELETE
 ; (member "fall" (list "hop" "skip" "jump"))
