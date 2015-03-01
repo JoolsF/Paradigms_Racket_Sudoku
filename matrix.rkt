@@ -50,6 +50,16 @@
 
 
 
+;ADD COLUMN INDEX TO MATRIX
+(define (add-column-index matrix)
+  (map (lambda (x) 
+         (zip x (list 0 1 2 3 4 5 6 7 8) ))
+       matrix))  ;<-- gives the index
+
+
+
+
+
 ;;takes a list of lists and returns the contents of all singletons as a list 
 (define (find-singleton lst)
   (acc-find-singleton lst '()))
@@ -85,50 +95,37 @@
 
 
 ; TO DO - refactor
+(define (zip p q) (map list p q)) 
+
 (define (find-singleton-column item-no matrix)
-  (find-singleton (map (lambda (x) (get-item 0 x)) matrix)))
+  (find-singleton (map (lambda (x) (get-item item-no x)) matrix)))
+
+
 
 
 (define (remove-col-dupe matrix)
   (deep-map-innermost-list (lambda (x) 
                              (remove-if-non-singleton (find-singleton-column 0 matrix) x))
                            matrix))
-                         
-
- ;;TEST AREA
-
-(define (rebuild jmatrix)
-  (append (map (lambda (x) (rebuild-row x '() 0)) jmatrix) '()))
-  ;(rebuild-row jmatrix '() 0))
+       
 
 
-  
-(define (rebuild-row row acc index)
-  (cond
-  [(empty? row) acc]
-   [(rebuild-row (cdr row) acc (+ index 1)) (append acc row  )]))
+;;START HERE NEED TO APPLY SOLVE METHODS TO DIFFERENT LIST STRUCTURE
+;; these are the inner element after ---> (add-column-index (transform matrix))
+;; (define TESTLIST (list (list 1 2 3 4 5 6 7 8 9) 0))
+;; base case is (pair? (cadr TESTLIST)) which is the index
+
+
+(define TESTLIST (list (list 1 2 3 4 5 6 7 8 9) 0))
+
+;(deep-map-innermost-list (lambda (x) (print x)) jools)
 
 
 
-;;for each row, rebuild with  remove-if-non-singleton (find-singleton-column index matrix) row
 
 
 
-(rebuild (solve(transform matrix)))
 
-
-
-;;END OF TEST AREA
-
-;; PROGRAM EXCECUTION
-
-;(find-singleton-column 0 (solve(transform matrix)))
-
-
-
-;(length (solve (transform matrix)))
-
-;(remove-col-dupe (solve(transform matrix)))
 
 
 ;;;NOTES TO DELETE
