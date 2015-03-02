@@ -23,12 +23,12 @@
 
 ; TO DO - refactor 
 ;Applies function to innermost lists of a matrix
-(define (deep-map-innermost-list f l)
-  (let deep ((x l)) 
-    (cond [(null? x) x]
-          [(and (pair? x) (number? (car x)))
-           (f x)]
-          (else (map deep x)))))
+;(define (deep-map-innermost-list f l)
+ ; (let deep ((x l)) 
+  ;  (cond [(null? x) x]
+   ;       [(and (pair? x) (number? (car x)))
+    ;       (f x)]
+     ;     (else (map deep x)))))
 
 
 (define (zip p q) (map list p q)) 

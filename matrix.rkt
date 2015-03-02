@@ -59,16 +59,58 @@
 
 
 
-;(define (remove-col-dupe matrix)
- ; (remove-col-dupe-helper(add-column-index matrix) matrix))
- ; (print (add-column-index matrix)))
+(define (remove-col-dupe matrix)
+  (map (lambda (indexed-matrix) 
+         (remove-col-dupe-helper indexed-matrix matrix))
+       (add-column-index matrix)))
+
+
+
+(define (remove-col-dupe-helper indexed-matrix matrix)
+  ; (print (append indexed-matrix (list "XX"))))
+  ;(map (lambda (x) (print (car x)))
+  (map (lambda (x)
+        
+        (print (remove-if-non-singleton (find-singleton-column (cadr x) matrix) (car x)))
+         (car x))
+       indexed-matrix))
+  
+
+
+
+  
+  (remove-col-dupe (solve(transform matrix)))
+  
+  
+
+;(define (remove-col-dupe-helper indexed-matrix matrix)
+ ; (let deep ((x matrix)) 
+  ;  (cond [(null? x) x]
+   ;       [(and (pair? x) (number? (cadr x)))
+    ;       (print (cadr x))]
+           ;(remove-if-non-singleton (find-singleton-column (cadr x) matrix) (car x))]
+     ;     (else (map deep x)))))
+
+
+
+
 
 
 ;(define (remove-col-dupe-helper indexed-matrix matrix)
- ; (map-indexed-matrix (lambda (x) 
-  ;                           (remove-if-non-singleton (find-singleton-column 0 matrix) x))
-       ; print x))
-   ;                        indexed-matrix))
+ ; (deep-map-innermost-list (lambda (x) 
+                         ; (remove-if-non-singleton (find-singleton-column 0 matrix) x)
+   ;     (print (append x (list "XX"))))
+    ;                       indexed-matrix))
+
+
+
+;(define (deep-map-innermost-list f l)
+ ; (let deep ((x l)) 
+  ;  (cond [(null? x) x]
+   ;       [(and (pair? x) (number? (cadr x)))
+    ;       (f x)]
+     ;     (else (map deep x)))))
+
        
 
 
@@ -76,49 +118,25 @@
 
 ;;START HERE NEED TO APPLY SOLVE METHODS TO DIFFERENT LIST STRUCTURE
 ;; these are the inner element after ---> (add-column-index (transform matrix))
-;; (define TESTLIST (list (list 1 2 3 4 5 6 7 8 9) 0))
+ (define TESTLIST (list (list 1 2 3 4 5 6 7 8 9) 0))
 ;; base case is (pair? (cadr TESTLIST)) which is the index
 
 
-
-
-
-
-(define jtemp (add-column-index (transform matrix)))
-
-;(map (lambda (x) (print (append x (list "XXX")))) jtemp)
-
-;(solve (car jtemp))
-
-
-
-
-
+(define JOOLS (list(list(list 1 2 3 4 5 6 7 8 9) 0) (list (list 2) 1) (list(list 5) 2) (list( list 1 2 3 4 5 6 7 8 9) 3) (list (list 1 2 3 4 5 6 7 8 9) 4) (list (list 1) 5) (list ( list 1 2 3 4 5 6 7 8 9) 6) (list (list 1 2 3 4 5 6 7 8 9) 7) (list (list 1 2 3 4 5 6 7 8 9) 8)))
 ;;;;END OF TEST AREA
 
 
 
-(define JOOLS (list(list(list 1 2 3 4 5 6 7 8 9) 0) (list (list 2) 1) (list(list 5) 2) (list( list 1 2 3 4 5 6 7 8 9) 3) (list (list 1 2 3 4 5 6 7 8 9) 4) (list (list 1) 5) (list ( list 1 2 3 4 5 6 7 8 9) 6) (list (list 1 2 3 4 5 6 7 8 9) 7) (list (list 1 2 3 4 5 6 7 8 9) 8)))
 
+;(solve(add-column-index (transform matrix)))
 
-
-
-
-(define TESTLIST (list (list 1 2 3 4 5 6 7 8 9) 0))
-
-;(deep-map-innermost-list (lambda (x) (print x)) jools)
-
-
-
-(solve(add-column-index (transform matrix)))
-
-;(remove-col-dupe (solve(transform matrix)))
+(define TESTY (add-column-index (solve(transform matrix))))
 
 ;(transform matrix)
-
 ;(solve (transform matrix))
+;(add-column-index (solve (transform matrix)))
 
-
+;(remove-col-dupe (solve(transform matrix)))
 
 
 
