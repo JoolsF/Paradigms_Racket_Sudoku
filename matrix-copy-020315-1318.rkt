@@ -86,17 +86,16 @@
 
 (define (JOOLSTEST2 lst) 
   (append(map 
-   (lambda (x) (cdr x))
+   (lambda (x) (car x))
   lst)))
 
-(define (JOOLSTEST matrix)
-  (append(map 
+(define JOOLSTEST (append(map 
                    (lambda (x) (JOOLSTEST2 x)) 
-                       (add-column-index matrix)
+                       (add-column-index(solve(transform matrix)))
                        )))
 
 
-(JOOLSTEST (solve(transform matrix)))
+;JOOLSTEST (solve(transform
 
 
 
