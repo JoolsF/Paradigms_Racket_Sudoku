@@ -17,7 +17,7 @@
 ;  Gets item at position index in list
 (define (get-item index list)                   
       (cond 
-        [(null? list) '()]             
+        [(null? list) list]             
         [(= index 0) (car list)]
         [else (get-item (- index 1) (cdr list))]
         ))
@@ -99,7 +99,41 @@
    (lambda (x)
      (remove-if-non-singleton (find-singleton-column (cadr x) matrix) (car x)))
   indexed-matrix))
+
+
+(define grid (list 0 1 2 3 4 5 6 7 8))
+
+(define (filter-columns2 matrix)
+  (for*/list ([row grid] ;change to matrix size
+              [col grid]              
+              )
+    (let ([current-square (get-item row  (list(get-item col matrix)))]) ;; defines the current square in the matrix
+      (remove-if-non-singleton (find-singleton-column col matrix) current-square)
+      )
+      
+    )
+  )
+
+
+(define (filter-rows2 matrix)
+  (for*/list ([row grid] ;change to matrix size
+              [col grid]
+              ;#:when (not (empty?(get-item row (list (get-item col matrix))))) ; not sure why I need this
+              )
+    (let ([current-square (get-item row  (get-item col matrix))]) ;; defines the current square in the matrix
+      (remove-if-non-singleton (find-singleton (get-item row matrix)) current-square))
+      ;current-square
+      )
+      
+    )
   
+
+  
+
+
+;(filter-rows (transform matrix))
+  (filter-columns2 (transform matrix))
+
 
 
 ;;solve function to go here
@@ -119,20 +153,22 @@
 ;;;; TEST START
 
 
-(define grid (list 0 1 2 3 4 5 6 7 8))
-
+;(define grid (list 0 1 2 3 4 5 6 7 8))
 (define (traverse matrix)
- (for*/list ([row grid]
-             [col grid])
-   ;#:when (pair? (get-item row matrix) )))
-   (get-item row (list (get-item col matrix)))
-   ))
-  
+(for*/list ([row grid]
+            [col grid]
+;#:when (not (empty?(get-item row (list (get-item col matrix))))) ; not sure why I need this
+)
+  (get-item row (list (get-item col matrix)))
+  ))
+;(print matrix)
 
 
 
 
-(traverse matrix)
+;(traverse matrix)
+
+
 ;;;; TEST END
 
 
