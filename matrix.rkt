@@ -3,6 +3,9 @@
 (require racket/include)
 (include "data.rkt")
 
+
+
+
 ;;;; HELPER METHODS - Move to another file ;;;;
 
 ;  Takes a list of lists of arbitrary depth and applies function f to innermost element
@@ -30,6 +33,8 @@
 
 
 
+
+
 ;;;; FIND SINGLETONS ;;;;
 
 ; Takes a list of lists and returns the contents of all singletons as a list 
@@ -46,6 +51,24 @@
   (find-singleton (map (lambda (x) (get-item column-no x)) matrix)))
 
 
+;Find singleton in a square
+;ADD EXPLANATION
+(define (find-singleton-square matrix row col)
+        (find-singleton (find-singleton-square-helper matrix row col)))
+
+(define (find-singleton-square-helper matrix row col)
+  (let* ([row (- row (modulo row 3))]
+        [col  (- col (modulo col 3))])
+    (for*/list  ([row (in-range row (+ row 3))]
+                 [col (in-range col (+ col 3))]
+                )
+  (get-item col (get-item row matrix))
+  )))
+         
+
+
+
+
 
 ;;;; Sudoku Setup ;;;;
 
@@ -58,8 +81,10 @@
             matrix))
 
 
-;;;; Solver Methods;;;;
 
+
+
+;;;; Solver Methods;;;;
 ; Analyses a row for singleton lists and removes these values from lists in the row of length > 1 
 (define (filter-rows matrix)
   (map (lambda (x) 
@@ -92,6 +117,30 @@
     )
   )
 
+;Analyses each element's square for singleton lists and removes these values the element
+(define (filter-squares matrix)
+   (for*/list ([row (length matrix)])
+    (let ([current-row (get-item row matrix)])
+      (filter-squares-helper current-row row matrix)
+      )
+    )
+  )
+
+(define (filter-squares-helper matrix-row row matrix)
+  (for*/list ([col (length matrix-row)])
+    (let ([current-element (get-item col matrix-row)])
+       (remove-if-non-singleton (find-singleton-square matrix row col) current-element)
+      )
+    )
+  )
+
+
+
+
+
+
+
+;;;
 
 ;;;; SOLVE FUNCTION ;;;;
 ; should repeatedly run filter-columns, filter-rows, filter-squares whilst checking if sudoku solved i.e every list a singleton
@@ -100,5 +149,4 @@
 
 ;;EXECUTE HERE
 
-(filter-rows(filter-columns (transform matrix)))
-;(filter-columns2 (filter-rows2 (transform matrix)))
+(filter-squares(filter-rows(filter-columns(filter-squares(filter-rows(filter-columns (transform matrix)))))))
