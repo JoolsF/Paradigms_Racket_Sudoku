@@ -147,6 +147,17 @@
 ;  once all sets of numbers are reduced to length 1, flatten each row into original format of Matrix
 
 
+(define (solve matrix)
+  (let ([matrix-pre (matrix)]
+        [matrixpost (filter-squares(filter-rows(filter-columns (transform matrix))))]
+        (
+        
+        )
+  
+
+
+
+
 ;;EXECUTE HERE
 
-(filter-squares(filter-rows(filter-columns(filter-squares(filter-rows(filter-columns (transform matrix)))))))
+(filter-squares(filter-rows(filter-columns (transform matrix))))
