@@ -4,13 +4,12 @@
 (include "data.rkt")
 
 
-
-
-;;;; HELPER METHODS - Move to another file ;;;;
+;;;; HELPER METHODS ;;;;
 
 ;  Takes a list of lists of arbitrary depth and applies function f to innermost element
-;  Taken from http://stackoverflow.com/questions/5699899/scheme-map-function-for-applying-a-function-to-elements-in-a-nested-list
-;  As can be seen from Github history, I had something similar but needed abstraction to avoid code repetition.
+;  Taken from http://stackoverflow.com/questions/5699899/scheme-map-function-for-applying-a-function-to-elements-in-a-nested-list.  Had similar method (see first commits) 
+;  but wanted abstraction of deep-map principle
+
 (define (deep-map f l)
   (let deep ((x l))
     (cond ((null? x) x)
@@ -30,6 +29,7 @@
   (if (> (length lst) 1) 
       (remove* lst-to-remove lst)
       lst)) 
+
 
 
 
@@ -134,12 +134,6 @@
     )
   )
 
-
-
-
-
-
-
 ;;;
 
 ;;;; SOLVE FUNCTION ;;;;
@@ -148,16 +142,13 @@
 
 
 (define (solve matrix)
-  (let ([matrix-pre (matrix)]
-        [matrixpost (filter-squares(filter-rows(filter-columns (transform matrix))))]
-        (
+  (let ([matrix-pre matrix]
+        [matrix-post (filter-squares(filter-rows(filter-columns matrix)))])
+    (cond
+      [(equal? matrix-pre matrix-post) matrix]
+      [else (solve matrix-post)])))
         
-        )
-  
-
-
-
 
 ;;EXECUTE HERE
 
-(filter-squares(filter-rows(filter-columns (transform matrix))))
+(solve (transform matrix))
