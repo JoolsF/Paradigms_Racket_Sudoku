@@ -10,6 +10,9 @@
 ;;;MAIN FUNCTION;;;;
 
 ;; Repeatedly calls filter-columns, filter-rows and filter-square checking if matrix solved at each iteration.
+(define (solve matrix)
+  (solve-helper (transform matrix)))
+
 (define (solve-helper matrix)
   (let ([matrix-pre matrix]
         [matrix-post (filter-squares(filter-rows(filter-columns matrix)))])
@@ -106,6 +109,44 @@
       )
     )
   )
+
+
+
+;;Checks each set for elements not occuring in any other set in the same row, col, or grid square
+; (remove-duplicates (append '(1 2 3) '(1 2 6)))
+(define (get-row-set matrix)
+   (for*/list ([row (length matrix)])
+    (let ([current-row (get-item row matrix)])
+      (display (remove-duplicates(flatten current-row)))
+      (display 'x)
+      
+      
+      )
+    )
+  )
+
+;(set-difference  '(4 6 7 8) '(3 7 8 9 2 5 6 1)) returns 4
+; This function taken from here http://stackoverflow.com/questions/11621576/list-difference-in-scheme
+(define (set-difference s1 s2)
+  (cond ((null? s1)
+         '())
+        ((not (member (car s1) s2))
+         (cons (car s1) (set-difference (cdr s1) s2)))
+        (else
+         (set-difference (cdr s1) s2))))
+
+
+
+(define (j-test-helper matrix-row row matrix)
+  (for*/list ([col (length matrix-row)])
+    (let ([current-element (get-item col matrix-row)])
+     current-element
+       
+      )
+    )
+  )
+
+
 
 
 
