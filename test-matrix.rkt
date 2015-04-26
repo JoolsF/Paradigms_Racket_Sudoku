@@ -6,8 +6,9 @@
 (require racket/include)
 (include "data.rkt")
 
-;;;NOTE THIS IS A PARTIAL SOLUTION SEE README AND text-matrix.rkt
-;;;MISSING PART OF THE ALGORITHM, test-matrix shows approach to solving this however
+;;;THIS IS NOT THE MAIN PROGRAM, THIS IS TO SHOW WORKING OUT;;;
+;;; PLEASE SEE matrix.rkt AND REFER TO GITHUB README;;;;
+
 
 ;;;MAIN FUNCTION;;;;
 
@@ -17,7 +18,7 @@
 
 (define (solve-helper matrix)
   (let ([matrix-pre matrix]
-        [matrix-post (filter-squares(filter-rows(filter-columns matrix)))])
+        [matrix-post (reduce-set(filter-squares(filter-rows(filter-columns matrix))))])
     (cond
       [(equal? matrix-pre matrix-post) matrix]
       [else (solve-helper matrix-post)])))
@@ -113,7 +114,6 @@
 
 
 
-
 ;; Analyses each element's grid square for singleton lists and removes these values
 (define (filter-squares matrix)
    (for*/list ([row (length matrix)])
@@ -129,10 +129,6 @@
       )
     )
   )
-
-
-
-
 
 
 ;;;; HELPER METHODS ;;;;
@@ -158,4 +154,79 @@
 (define (remove-if-non-singleton lst-to-remove lst)
   (if (> (length lst) 1) 
       (remove* lst-to-remove lst)
-      lst))
+      lst)) 
+
+
+
+
+
+
+
+
+;;;;;NOT USED WORK IN PROGRESS BELOW;;;;;
+; Ser github "readme"
+; These functions are for the second part of the algorithm
+; - Find a number in a set that does not occur in any other set in the same row (or column, or box).
+; - Reduce that set to a singleton containing that one number.
+; However, there is a bug when integrating them into main program so not being used currently. Running (solve matrix) on this version gives an error on row 3
+; The solution below is also verbose and in need of streamlining and abstracting
+
+
+ 
+
+(define (reduce-set matrix)
+  (for*/list ([row (length matrix)])
+    (let ([current-row (get-item row matrix)])
+      (reduce-set-helper current-row matrix)
+      )
+    )
+  )
+
+
+(define (reduce-set-helper matrix-row matrix)
+  (for*/list ([col (length matrix-row)])
+    (let ([current-element (get-item col matrix-row)])
+      (only-possible-no (find-element-column find-non-singleton col matrix) current-element)
+      )
+    ))
+
+
+
+ 
+;;Takes a list and returns all those elements in the list that are not duplicates
+(define (keep-non-duplicates lst)
+  (keep-non-duplicates-helper lst lst '()))
+(define (keep-non-duplicates-helper lst original-lst acc)
+  (cond[(empty? lst) acc]
+       [(= 1 (count-occurences (car lst) original-lst 0))
+        (keep-non-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
+       [else (keep-non-duplicates-helper (cdr lst) original-lst acc)]))
+
+
+;;KEEP DUPLICATES
+(define (keep-duplicates lst)
+  (keep-duplicates-helper lst lst '()))
+(define (keep-duplicates-helper lst original-lst acc)
+  (cond[(empty? lst) acc]
+       [(>  (count-occurences (car lst) original-lst 0) 1)
+        (keep-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
+       [else (keep-duplicates-helper (cdr lst) original-lst acc)]))
+
+;Count occurrences of a given character in a list
+(define (count-occurences character lst acc)
+  (cond
+    [(empty? lst) acc]
+    [(eq? character (car lst)) (count-occurences character (cdr lst) (+ acc 1))]
+    [else (count-occurences character (cdr lst) acc)]))
+  
+  
+(define (only-possible-no lsts lstcompare)
+  (only-possible-no-helper (flatten(append lsts)) lstcompare))
+
+(define (only-possible-no-helper lstFlat lstcompare)
+ (let ([result  (keep-duplicates (append(keep-non-duplicates lstFlat) lstcompare))])
+  (cond
+     [(= (length result) 2) (cdr result)]
+     [else lstcompare])))
+
+
