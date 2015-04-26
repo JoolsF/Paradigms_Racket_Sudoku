@@ -1,7 +1,7 @@
 #lang racket
 
 ;; Author Julian Fenner ;;
-;; Run by calling (solve (transform matrix))
+;; Run by calling (solve matrix))
  
 (require racket/include)
 (include "data.rkt")
@@ -105,12 +105,10 @@
 (define (filter-columns-helper matrix-row matrix)
   (for*/list ([col (length matrix-row)])
     (let ([current-element (get-item col matrix-row)])
-      ;(remove-if-non-singleton (find-element-column find-singleton col matrix) current-element)
-      (remove-if-only-option (find-element-column find-non-singleton col matrix) current-element)
-;:TEST
+      (remove-if-non-singleton (find-element-column find-singleton col matrix) current-element)
+;BUG      ;(mergeLists (find-element-column find-non-singleton col matrix) current-element)
       )
     ))
-
 
 
 
@@ -168,40 +166,25 @@
 
 
 
-;;TEST
-(define (remove-if-only-option lst-to-remove lst-element)
-  (let ([non-dupe-lst (keep-non-duplicates lst-to-remove)])
-     (cond
-       [(> (length (common-elements non-dupe-lst lst-element)) 1) non-dupe-lst]
-       [else lst-element])))
+;;;;;NOT USED::::::
+; These functions are for the second part of the algorithm
+; - Find a number in a set that does not occur in any other set in the same row (or column, or box).
+; - Reduce that set to a singleton containing that one number.
+; However, there is a bug when integrating them into main program so not being used currently
 
  
-(define (common-elements lsta lstb)
- (keep-only-duplicates (append lsta lstb)))
-             
- 
 
+ 
+;;Takes a list and returns all those elements in the list that are not duplicates
 (define (keep-non-duplicates lst)
   (keep-non-duplicates-helper lst lst '()))
-
 (define (keep-non-duplicates-helper lst original-lst acc)
   (cond[(empty? lst) acc]
        [(= 1 (count-occurences (car lst) original-lst 0))
         (keep-non-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
        [else (keep-non-duplicates-helper (cdr lst) original-lst acc)]))
 
-
-(define (keep-only-duplicates lst)
-  (keep-only-duplicates-helper lst lst '()))
-
-(define (keep-only-duplicates-helper lst original-lst acc)
-  (cond[(empty? lst) acc]
-       [(> (count-occurences (car lst) original-lst 0) 1)
-        (keep-only-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
-       [else (keep-only-duplicates-helper (cdr lst) original-lst acc)]))
-
-
-
+;Count occururences of a given character in a list
 (define (count-occurences character lst acc)
   (cond
     [(empty? lst) acc]
@@ -210,26 +193,16 @@
   
   
 
-
-
-;;TEST 2
-;take list of lists, append them and flatten them and then remove elements from second list from first
-;if listcompare contains an element that the other rest of the list minus lst compare don't then this element is return
+; Takes a list of lists in 'lst' param and flattens them removing all values that are non duplicates
+; It then compares this list with 'lst compare' and any common values are returned.  
+; E.g   (mergeLists (list 3 7 8 9 3 7 8 3 6 8 9 7 8 9 3 7 8 4 6 7 8) (list 4)) => '(4)
 
 (define (mergeLists lsts lstcompare)
   (merge-lists-helper (flatten(append lsts)) lstcompare))
 
 (define (merge-lists-helper lstFlat lstcompare)
- ;(display (keep-non-duplicates lstFlat)))
-  (keep-non-duplicates (append lstFlat lstcompare)))
-
-
-(define (set-difference s1 s2)
-  (cond ((null? s1)
-         '())
-        ((not (member (car s1) s2))
-         (cons (car s1) (set-difference (cdr s1) s2)))
-        (else
-         (set-difference (cdr s1) s2))))
-
-
+ (let ([result  (keep-non-duplicates (append lstFlat lstcompare))]) ; <--- wrong
+   (cond
+     [(= (length result) 1) result]
+     [else lstcompare])))
+ 
