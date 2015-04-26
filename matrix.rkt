@@ -197,10 +197,10 @@
 ; It then compares this list with 'lst compare' and any common values are returned.  
 ; E.g   (mergeLists (list 3 7 8 9 3 7 8 3 6 8 9 7 8 9 3 7 8 4 6 7 8) (list 4)) => '(4)
 
-(define (mergeLists lsts lstcompare)
-  (merge-lists-helper (flatten(append lsts)) lstcompare))
+(define (only-possible-no lsts lstcompare)
+  (only-possible-no-helper (flatten(append lsts)) lstcompare))
 
-(define (merge-lists-helper lstFlat lstcompare)
+(define (only-possible-no-helper lstFlat lstcompare)
  (let ([result  (keep-non-duplicates (append lstFlat lstcompare))]) ; <--- wrong
    (cond
      [(= (length result) 1) result]
