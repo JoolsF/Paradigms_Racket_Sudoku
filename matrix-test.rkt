@@ -45,15 +45,26 @@
    [(empty? lst) resLst]
    [(= (length (car lst)) 1)  (acc-find-singleton (cdr lst) (append resLst (car lst)  ))]
    [else (acc-find-singleton (cdr lst) resLst)]))
-  
-;; Finds singleton element in matrix column 
-(define (find-singleton-column column-no matrix)
-  (find-singleton (map (lambda (x) (get-item column-no x)) matrix)))
 
-;; Find singletons in a 3x3 grid square
-(define (find-singleton-square matrix row col)
-        (find-singleton (find-singleton-square-helper matrix row col)))
-(define (find-singleton-square-helper matrix row col)
+;; Takes a list of lists and returns the contents of all singletons as a list 
+(define (find-non-singleton lst)
+  (acc-find-non-singleton lst '()))
+(define (acc-find-non-singleton lst resLst)
+  (cond 
+   [(empty? lst) resLst]
+   [(> (length (car lst)) 1)  (acc-find-non-singleton (cdr lst) (append resLst (car lst)  ))]
+   [else (acc-find-non-singleton (cdr lst) resLst)]))
+
+
+  
+;; Finds singleton or non singleton elements in matrix column depending on what function f is defined as 
+(define (find-element-column f column-no matrix)
+  (f (map (lambda (x) (get-item column-no x)) matrix)))
+
+;; Finds singleton or non singleton elements in matrix 3X3 grid depending on what function f is defined as
+(define (find-element-square f matrix row col)
+        (f (find-element-square-helper matrix row col)))
+(define (find-element-square-helper matrix row col)
   (let* ([row (- row (modulo row 3))]
         [col  (- col (modulo col 3))])
     (for*/list  ([row (in-range row (+ row 3))]
@@ -85,10 +96,17 @@
       )
     )
   )
+;;TESTING HERE!!!
 (define (filter-columns-helper matrix-row matrix)
   (for*/list ([col (length matrix-row)])
     (let ([current-element (get-item col matrix-row)])
-       (remove-if-non-singleton (find-singleton-column col matrix) current-element)
+       (remove-if-non-singleton (find-element-column find-singleton col matrix) current-element)
+      ;;TEST
+      ;(display 'X)
+      ;(display (find-element-column find-non-singleton col matrix))
+      ;(display 'Y)
+      (remove-if-only-option (find-element-column find-non-singleton col matrix) current-element)
+      ;:TEST
       )
     )
   )
@@ -105,48 +123,10 @@
 (define (filter-squares-helper matrix-row row matrix)
   (for*/list ([col (length matrix-row)])
     (let ([current-element (get-item col matrix-row)])
-       (remove-if-non-singleton (find-singleton-square matrix row col) current-element)
+       (remove-if-non-singleton (find-element-square find-singleton matrix row col) current-element)
       )
     )
   )
-
-
-
-;;Checks each set for elements not occuring in any other set in the same row, col, or grid square
-; (remove-duplicates (append '(1 2 3) '(1 2 6)))
-(define (get-row-set matrix)
-   (for*/list ([row (length matrix)])
-    (let ([current-row (get-item row matrix)])
-      (display (remove-duplicates(flatten current-row)))
-      (display 'x)
-      
-      
-      )
-    )
-  )
-
-;(set-difference  '(4 6 7 8) '(3 7 8 9 2 5 6 1)) returns 4
-; This function taken from here http://stackoverflow.com/questions/11621576/list-difference-in-scheme
-(define (set-difference s1 s2)
-  (cond ((null? s1)
-         '())
-        ((not (member (car s1) s2))
-         (cons (car s1) (set-difference (cdr s1) s2)))
-        (else
-         (set-difference (cdr s1) s2))))
-
-
-
-(define (j-test-helper matrix-row row matrix)
-  (for*/list ([col (length matrix-row)])
-    (let ([current-element (get-item col matrix-row)])
-     current-element
-       
-      )
-    )
-  )
-
-
 
 
 
@@ -174,3 +154,79 @@
   (if (> (length lst) 1) 
       (remove* lst-to-remove lst)
       lst)) 
+
+
+;;TEST
+(define (remove-if-only-option lst-to-remove lst-element)
+  (let ([non-dupe-lst (keep-non-duplicates lst-to-remove)])
+   ;(display non-dupe)
+     (cond
+    ;[(= (length lst-element) 1) lst-element]
+     [(empty? (set-difference non-dupe-lst lst-element)) non-dupe-lst]  ;<---- BUG IS HERE
+     [else lst-element])))
+    
+  
+
+;; (keep-non-duplicates (list 3 3 7 6 8 8 9 9 6 4)) <----- BUG
+(define (keep-non-duplicates lst)
+  (keep-non-duplicates-helper lst lst '()))
+
+(define (keep-non-duplicates-helper lst original-lst acc)
+  (cond[(empty? lst) acc]
+       [(= 1 (count-occurences (car lst) original-lst 0))
+        (keep-non-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
+       [else (keep-non-duplicates-helper (cdr lst) original-lst acc)]))
+
+
+(define (count-occurences character lst acc)
+  (cond
+    [(empty? lst) acc]
+    [(eq? character (car lst)) (count-occurences character (cdr lst) (+ acc 1))]
+    [else (count-occurences character (cdr lst) acc)]))
+  
+  
+
+
+
+
+
+
+
+
+
+
+  
+  ;(cond [(empty? lst) acc]
+   ;     [(memq (car lst) (cdr lst)) (keep-non-duplicates-helper (cdr lst) acc)]
+    ;    [else keep-non-duplicates-helper (cdr lst) (append (list(car lst)) acc)]))
+ 
+; (> (memq 'a '(b c))
+  ;   CHECK IF CAR MEMBER OF CDR IF NOT THEN ADD TO ACC
+
+;;;;TEST AREA
+
+;;Checks each set for elements not occuring in any other set in the same row, col, or grid square
+; (remove-duplicates (append '(1 2 3) '(1 2 6)))
+(define (get-row-set matrix)
+   (for*/list ([row (length matrix)])
+    (let ([current-row (get-item row matrix)])
+      (display (remove-duplicates(flatten current-row)))
+      (display 'x)
+      
+      
+      )
+    )
+  )
+
+;(set-difference  '(4 6 7 8) '(3 7 8 9 2 5 6 1)) returns 4
+; This function taken from here http://stackoverflow.com/questions/11621576/list-difference-in-scheme
+(define (set-difference s1 s2)
+  (cond ((null? s1)
+         '())
+        ((not (member (car s1) s2))
+         (cons (car s1) (set-difference (cdr s1) s2)))
+        (else
+         (set-difference (cdr s1) s2))))
+
+
+
