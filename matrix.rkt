@@ -1,7 +1,7 @@
 #lang racket
 
 ;; Author Julian Fenner ;;
-;; Run by calling (solve (transform matrix))
+;; Run by calling (solve matrix))
  
 (require racket/include)
 (include "data.rkt")
@@ -11,11 +11,14 @@
 
 ;; Repeatedly calls filter-columns, filter-rows and filter-square checking if matrix solved at each iteration.
 (define (solve matrix)
+  (solve-helper (transform matrix)))
+
+(define (solve-helper matrix)
   (let ([matrix-pre matrix]
         [matrix-post (filter-squares(filter-rows(filter-columns matrix)))])
     (cond
       [(equal? matrix-pre matrix-post) matrix]
-      [else (solve matrix-post)])))
+      [else (solve-helper matrix-post)])))
 
 
 
@@ -42,15 +45,26 @@
    [(empty? lst) resLst]
    [(= (length (car lst)) 1)  (acc-find-singleton (cdr lst) (append resLst (car lst)  ))]
    [else (acc-find-singleton (cdr lst) resLst)]))
-  
-;; Finds singleton element in matrix column 
-(define (find-singleton-column column-no matrix)
-  (find-singleton (map (lambda (x) (get-item column-no x)) matrix)))
 
-;; Find singletons in a 3x3 grid square
-(define (find-singleton-square matrix row col)
-        (find-singleton (find-singleton-square-helper matrix row col)))
-(define (find-singleton-square-helper matrix row col)
+;; Takes a list of lists and returns the contents of all singletons as a list 
+(define (find-non-singleton lst)
+  (acc-find-non-singleton lst '()))
+(define (acc-find-non-singleton lst resLst)
+  (cond 
+   [(empty? lst) resLst]
+   [(> (length (car lst)) 1)  (acc-find-non-singleton (cdr lst) (append resLst (car lst)  ))]
+   [else (acc-find-non-singleton (cdr lst) resLst)]))
+
+
+  
+;; Finds singleton or non singleton elements in matrix column depending on what function f is defined as 
+(define (find-element-column f column-no matrix)
+  (f (map (lambda (x) (get-item column-no x)) matrix)))
+
+;; Finds singleton or non singleton elements in matrix 3X3 grid depending on what function f is defined as
+(define (find-element-square f matrix row col)
+        (f (find-element-square-helper matrix row col)))
+(define (find-element-square-helper matrix row col)
   (let* ([row (- row (modulo row 3))]
         [col  (- col (modulo col 3))])
     (for*/list  ([row (in-range row (+ row 3))]
@@ -58,6 +72,10 @@
   (get-item col (get-item row matrix))
   )))
          
+
+
+
+
 
 
 ;;;;SOLVER FUNCTIONS;;;;
@@ -82,13 +100,17 @@
       )
     )
   )
+
+
 (define (filter-columns-helper matrix-row matrix)
   (for*/list ([col (length matrix-row)])
     (let ([current-element (get-item col matrix-row)])
-       (remove-if-non-singleton (find-singleton-column col matrix) current-element)
+      (remove-if-non-singleton (find-element-column find-singleton col matrix) current-element)
+;BUG      ;(mergeLists (find-element-column find-non-singleton col matrix) current-element)
       )
-    )
-  )
+    ))
+
+
 
 
 ;; Analyses each element's grid square for singleton lists and removes these values
@@ -102,10 +124,13 @@
 (define (filter-squares-helper matrix-row row matrix)
   (for*/list ([col (length matrix-row)])
     (let ([current-element (get-item col matrix-row)])
-       (remove-if-non-singleton (find-singleton-square matrix row col) current-element)
+       (remove-if-non-singleton (find-element-square find-singleton matrix row col) current-element)
       )
     )
   )
+
+
+
 
 
 
@@ -133,3 +158,51 @@
   (if (> (length lst) 1) 
       (remove* lst-to-remove lst)
       lst)) 
+
+
+
+
+
+
+
+
+;;;;;NOT USED::::::
+; These functions are for the second part of the algorithm
+; - Find a number in a set that does not occur in any other set in the same row (or column, or box).
+; - Reduce that set to a singleton containing that one number.
+; However, there is a bug when integrating them into main program so not being used currently
+
+ 
+
+ 
+;;Takes a list and returns all those elements in the list that are not duplicates
+(define (keep-non-duplicates lst)
+  (keep-non-duplicates-helper lst lst '()))
+(define (keep-non-duplicates-helper lst original-lst acc)
+  (cond[(empty? lst) acc]
+       [(= 1 (count-occurences (car lst) original-lst 0))
+        (keep-non-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
+       [else (keep-non-duplicates-helper (cdr lst) original-lst acc)]))
+
+;Count occururences of a given character in a list
+(define (count-occurences character lst acc)
+  (cond
+    [(empty? lst) acc]
+    [(eq? character (car lst)) (count-occurences character (cdr lst) (+ acc 1))]
+    [else (count-occurences character (cdr lst) acc)]))
+  
+  
+
+; Takes a list of lists in 'lst' param and flattens them removing all values that are non duplicates
+; It then compares this list with 'lst compare' and any common values are returned.  
+; E.g   (mergeLists (list 3 7 8 9 3 7 8 3 6 8 9 7 8 9 3 7 8 4 6 7 8) (list 4)) => '(4)
+
+(define (mergeLists lsts lstcompare)
+  (merge-lists-helper (flatten(append lsts)) lstcompare))
+
+(define (merge-lists-helper lstFlat lstcompare)
+ (let ([result  (keep-non-duplicates (append lstFlat lstcompare))]) ; <--- wrong
+   (cond
+     [(= (length result) 1) result]
+     [else lstcompare])))
+ 
