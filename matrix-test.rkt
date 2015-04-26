@@ -74,6 +74,10 @@
          
 
 
+
+
+
+
 ;;;;SOLVER FUNCTIONS;;;;
 
 ;; Analyses a row for singleton lists and removes those values from lists in the row of length > 1 
@@ -96,20 +100,19 @@
       )
     )
   )
-;;TESTING HERE!!!
+
+
 (define (filter-columns-helper matrix-row matrix)
   (for*/list ([col (length matrix-row)])
     (let ([current-element (get-item col matrix-row)])
-       (remove-if-non-singleton (find-element-column find-singleton col matrix) current-element)
-      ;;TEST
-      ;(display 'X)
-      ;(display (find-element-column find-non-singleton col matrix))
-      ;(display 'Y)
+      ;(remove-if-non-singleton (find-element-column find-singleton col matrix) current-element)
       (remove-if-only-option (find-element-column find-non-singleton col matrix) current-element)
-      ;:TEST
+;:TEST
       )
-    )
-  )
+    ))
+
+
+
 
 
 ;; Analyses each element's grid square for singleton lists and removes these values
@@ -127,6 +130,9 @@
       )
     )
   )
+
+
+
 
 
 
@@ -156,18 +162,25 @@
       lst)) 
 
 
+
+
+
+
+
+
 ;;TEST
 (define (remove-if-only-option lst-to-remove lst-element)
   (let ([non-dupe-lst (keep-non-duplicates lst-to-remove)])
-   ;(display non-dupe)
      (cond
-    ;[(= (length lst-element) 1) lst-element]
-     [(empty? (set-difference non-dupe-lst lst-element)) non-dupe-lst]  ;<---- BUG IS HERE
-     [else lst-element])))
-    
-  
+       [(> (length (common-elements non-dupe-lst lst-element)) 1) non-dupe-lst]
+       [else lst-element])))
 
-;; (keep-non-duplicates (list 3 3 7 6 8 8 9 9 6 4)) <----- BUG
+ 
+(define (common-elements lsta lstb)
+ (keep-only-duplicates (append lsta lstb)))
+             
+ 
+
 (define (keep-non-duplicates lst)
   (keep-non-duplicates-helper lst lst '()))
 
@@ -176,6 +189,17 @@
        [(= 1 (count-occurences (car lst) original-lst 0))
         (keep-non-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
        [else (keep-non-duplicates-helper (cdr lst) original-lst acc)]))
+
+
+(define (keep-only-duplicates lst)
+  (keep-only-duplicates-helper lst lst '()))
+
+(define (keep-only-duplicates-helper lst original-lst acc)
+  (cond[(empty? lst) acc]
+       [(> (count-occurences (car lst) original-lst 0) 1)
+        (keep-only-duplicates-helper (cdr lst) original-lst (append (list(car lst)) acc))]
+       [else (keep-only-duplicates-helper (cdr lst) original-lst acc)]))
+
 
 
 (define (count-occurences character lst acc)
@@ -188,38 +212,18 @@
 
 
 
+;;TEST 2
+;take list of lists, append them and flatten them and then remove elements from second list from first
+;if listcompare contains an element that the other rest of the list minus lst compare don't then this element is return
+
+(define (mergeLists lsts lstcompare)
+  (merge-lists-helper (flatten(append lsts)) lstcompare))
+
+(define (merge-lists-helper lstFlat lstcompare)
+ ;(display (keep-non-duplicates lstFlat)))
+  (keep-non-duplicates (append lstFlat lstcompare)))
 
 
-
-
-
-
-
-  
-  ;(cond [(empty? lst) acc]
-   ;     [(memq (car lst) (cdr lst)) (keep-non-duplicates-helper (cdr lst) acc)]
-    ;    [else keep-non-duplicates-helper (cdr lst) (append (list(car lst)) acc)]))
- 
-; (> (memq 'a '(b c))
-  ;   CHECK IF CAR MEMBER OF CDR IF NOT THEN ADD TO ACC
-
-;;;;TEST AREA
-
-;;Checks each set for elements not occuring in any other set in the same row, col, or grid square
-; (remove-duplicates (append '(1 2 3) '(1 2 6)))
-(define (get-row-set matrix)
-   (for*/list ([row (length matrix)])
-    (let ([current-row (get-item row matrix)])
-      (display (remove-duplicates(flatten current-row)))
-      (display 'x)
-      
-      
-      )
-    )
-  )
-
-;(set-difference  '(4 6 7 8) '(3 7 8 9 2 5 6 1)) returns 4
-; This function taken from here http://stackoverflow.com/questions/11621576/list-difference-in-scheme
 (define (set-difference s1 s2)
   (cond ((null? s1)
          '())
@@ -227,6 +231,5 @@
          (cons (car s1) (set-difference (cdr s1) s2)))
         (else
          (set-difference (cdr s1) s2))))
-
 
 
