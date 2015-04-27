@@ -1,7 +1,7 @@
 # racket
 
 PPL Racket Assignment 2015
-- Sudoku solver. Enter (solve matrix) to run.
+- Sudoku solver. Open matrix.rkt and enter (solve matrix) to run.
 
 ### NOTE this is a **partial** solution. Explanation below
 -  The second step in the algorithm isnot working properly when integrated into the main program *"Find a number in a set that does not occur in any other set in the same row (or column, or box).Reduce that set to a singleton containing that one number.* 
